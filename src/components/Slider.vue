@@ -1,6 +1,5 @@
 <template>
     <v-container>
-
         <v-card-text>
             <v-row>
                 <v-col>
@@ -28,7 +27,10 @@
     const hueUrl = 'http://210.107.205.200:8080/api/wkcBD-lTULsGrCJ2hqZZqgeQsfathjs6zc3Rul1O/lights/10/state';
 
     export default {
-        props: ['type', 'min', 'max', 'target'],
+        props: ['type', 'min', 'max', 'target', 'initialValue'],
+        created() {
+            this.value = this.initialValue;
+        },
         data(){
             return{
                 value: 0,
@@ -58,7 +60,6 @@
                         bri: this.value
                     }
                 }
-                console.log(data);
                 axios.put(`${hueUrl}`, data)
             }
         }

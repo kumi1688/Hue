@@ -1,9 +1,61 @@
-module.exports = function rgbToHsv(r, g, b) {
+const PHILIPS_HUE_MAX_VALUE = 65535
+const PHILIPS_SATURATION_MAX_VALUE = 254
+const PHILIPS_BRIGHTNESS_MAX_VALUE = 254
+
+function HSBToRGB(hsb) {
+    var rgb = {};
+    var h = Math.round(hsb.h);
+    var s = Math.round(hsb.s * 255 / 100);
+    var v = Math.round(hsb.b * 255 / 100);
+
+    if (s == 0) {
+
+        rgb.r = rgb.g = rgb.b = v;
+    } else {
+        var t1 = v;
+        var t2 = (255 - s) * v / 255;
+        var t3 = (t1 - t2) * (h % 60) / 60;
+
+        if (h == 360) h = 0;
+
+        if (h < 60) {
+            rgb.r = t1;
+            rgb.b = t2;
+            rgb.g = t2 + t3
+        } else if (h < 120) {
+            rgb.g = t1;
+            rgb.b = t2;
+            rgb.r = t1 - t3
+        } else if (h < 180) {
+            rgb.g = t1;
+            rgb.r = t2;
+            rgb.b = t2 + t3
+        } else if (h < 240) {
+            rgb.b = t1;
+            rgb.r = t2;
+            rgb.g = t1 - t3
+        } else if (h < 300) {
+            rgb.b = t1;
+            rgb.g = t2;
+            rgb.r = t2 + t3
+        } else if (h < 360) {
+            rgb.r = t1;
+            rgb.g = t2;
+            rgb.b = t1 - t3
+        } else {
+            rgb.r = 0;
+            rgb.g = 0;
+            rgb.b = 0
+        }
+    }
+
+    return {r: Math.round(rgb.r), g: Math.round(rgb.g), b: Math.round(rgb.b)};
+}
+function rgbToHsv(r, g, b) {
     r = r / 255
     g = g / 255
     b = b / 255
 
-    console.log(r,g,b);
     let max = Math.max(r, g, b), min = Math.min(r, g, b)
     let h, s, v = max
 
@@ -13,17 +65,26 @@ module.exports = function rgbToHsv(r, g, b) {
     if (max == min) {
         h = 0          // achromatic
     } else {
-        console.log(max);
         switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6.0 : 0.0)
+            case r: h = (g - b) / d + (g < b ? 6 : 0)
                 break
-            case g: h = (b - r) / d + 2.0
+            case g: h = (b - r) / d + 2
                 break
-            case b: h = (r - g) / d + 4.0
+            case b: h = (r - g) / d + 4
                 break
         }
-        // h /= 6.0
+
+        h /= 6
     }
 
-    return [ Math.round(h * 360), Math.round(s * 100), Math.round(v * 100) ]
+    return [ Math.round(h * 360) * (PHILIPS_HUE_MAX_VALUE / 360),
+        Math.round(s * 100) * (PHILIPS_SATURATION_MAX_VALUE / 100),
+        Math.round(v * 100) * (PHILIPS_BRIGHTNESS_MAX_VALUE / 100)]
 }
+
+var Hue = {
+    rgbToHsv: rgbToHsv,
+    HSBToRGB: HSBToRGB
+}
+
+export default Hue;

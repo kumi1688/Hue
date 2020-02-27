@@ -29,8 +29,7 @@
     },
     components:{
       'side-bar': SideBar,
-      'control-container': ControlContainer
-
+      'control-container': ControlContainer,
     },
     data: () => ({
       drawer: null,
